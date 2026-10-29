@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
         body: JSON.stringify({ contents: [{ parts }] }),
       }
     );
-    if (!r.ok) return res.status(502).json({ error: 'upstream ' + r.status });
+    if (!r.ok) return res.status(502).json({ error: 'upstream ' + r.status + '' + (await r.text()).slice(0,300) });
     const d = await r.json();
     const text = (d.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('');
     return res.status(200).json({ text });
