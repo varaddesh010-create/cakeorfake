@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CakeOrFake – check and report food adulteration</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--tx:#222;--mu:#666;--sf:#f5f5f5;--ln:#ddd;--lk:#2a6cb0;--rd:#b3321f;--gn:#2b7a2b;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#181a18;--tx:#e8e8e8;--mu:#a5a5a5;--sf:#242724;--ln:#3a3d3a;--lk:#7db8ec;--rd:#ff8e7c;--gn:#7bd67b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#181a18;--tx:#e8e8e8;--mu:#a5a5a5;--sf:#242724;--ln:#3a3d3a;--lk:#7db8ec;--rd:#ff8e7c;--gn:#7bd67b;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 56px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.6 Poppins,"Noto Sans Devanagari",system-ui,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:#222;z-index:10}
+.w{max-width:960px;margin:0 auto;padding:0 15px}
+nav{background:#222;position:sticky;top:env(safe-area-inset-top,0px);z-index:9}
+nav .w{display:flex;align-items:center;gap:2px;overflow-x:auto}
+nav b{color:#9a9a9a;padding:0 12px 0 0;font-size:18px;white-space:nowrap}
+nav button{background:none;border:0;color:#9d9d9d;font:inherit;padding:15px 13px;cursor:pointer;white-space:nowrap}
+nav button.on{background:#000;color:#fff}
+nav select{margin-left:auto;font:inherit;padding:4px;border-radius:3px;border:0}
+.hero{background:#9acd32;color:#1c3300;padding:44px 0 38px}
+.hero h1{font-size:clamp(38px,9vw,64px);margin:0 0 8px;font-weight:700;letter-spacing:-1px}
+.hero p{font-size:19px;margin:0 0 20px;max-width:560px}
+.btn{background:#fff;color:#222;border:1px solid #ccc;border-radius:3px;padding:7px 14px;font:inherit;cursor:pointer;text-decoration:none;display:inline-block}
+.btn.p{background:#2a6cb0;color:#fff;border-color:#2a6cb0}
+main{padding:24px 0 48px}
+h2{font-size:30px;font-weight:500;margin:0 0 14px;padding-bottom:9px;border-bottom:1px solid var(--ln)}
+h2 small{font-size:65%;color:var(--mu);font-weight:400}
+h3{font-size:19px;margin:0 0 4px;color:var(--lk)}
+p{margin:0 0 10px}
+.g{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card svg{display:block;width:100%;height:auto;border-radius:4px;margin-bottom:10px}
+.card p{color:var(--mu);font-size:14px}
+.panel{background:var(--sf);border:1px solid var(--ln);border-radius:4px;padding:14px;margin-bottom:14px}
+.t{border-top:1px solid var(--ln);padding:14px 0}
+.t:first-child{border-top:0}
+.t h3{color:var(--tx);font-size:18px}
+.tag{font-size:12px;font-weight:700;border:1.5px solid;border-radius:3px;padding:0 6px;margin-left:8px;vertical-align:middle}
+.h{color:var(--gn)}.l{color:var(--rd)}
+dl{margin:6px 0 0}
+dt{font-weight:700;margin-top:6px}
+dd{margin:0}
+.ad{border-left:4px solid var(--rd);padding-left:10px;margin:0 0 10px}
+form{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}
+.f{display:flex;flex-direction:column;gap:3px}
+.f.w2{grid-column:1/-1}
+label{font-weight:700;font-size:14px}
+input,select,textarea{font:inherit;color:var(--tx);background:var(--bg);border:1px solid #999;border-radius:3px;padding:7px 9px;width:100%}
+textarea{min-height:80px}
+#dr{font:13px/1.45 ui-monospace,Menlo,monospace;min-height:200px}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+:focus-visible{outline:3px solid #2a6cb0;outline-offset:2px}
+.er{color:var(--rd);font-size:13px}
+.rep{border-top:1px solid var(--ln);padding:10px 0}
+.rep:first-child{border-top:0}
+.note{border-left:4px solid #9acd32;background:var(--sf);padding:10px 12px;margin:12px 0}
+h1,h2,h3,nav b{font-family:"Baloo 2",Poppins,"Noto Sans Devanagari",sans-serif}
+.logo{font-size:clamp(52px,14vw,92px);font-weight:800;line-height:1;letter-spacing:-1px;margin:0 0 10px}
+.logo .c{color:#1c3300}.logo .o{font-size:.42em;background:#fff;color:#1c3300;border-radius:999px;padding:.05em .4em;margin:0 .18em;vertical-align:.45em;letter-spacing:0}
+.logo .f{color:#8f1d0c;text-decoration:underline wavy #8f1d0c 4px;text-underline-offset:.12em}
+#aq{min-height:70px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:700px){.g2{grid-template-columns:1fr}}
+.big{font-size:22px;line-height:1.8}
+.cake{display:block;width:100%;max-width:340px;margin:0 auto 8px;border-radius:4px}
+.k{animation:kreal 3.6s ease-in-out forwards}.k.kb{animation-name:kfake;animation-timing-function:ease-out}
+.tp{transform-box:fill-box;transform-origin:center;animation:tpf 3.6s ease-out forwards}
+.s{animation:sl 3.6s ease-in-out forwards}
+.sp{opacity:0;animation:spk 3.6s linear forwards}
+.jt{animation:jt 3.6s linear forwards}
+@keyframes kreal{0%{transform:translateY(-64px)}45%,65%{transform:translateY(46px)}100%{transform:translateY(-64px)}}
+@keyframes sl{0%,45%{transform:translateX(0)}70%,100%{transform:translateX(20px)}}
+@keyframes kfake{0%{transform:translateY(-64px)}32%{transform:translateY(0)}38%{transform:translateY(-7px)}44%{transform:translateY(1px)}50%{transform:translateY(0)}72%,100%{transform:translateY(-18px)}}
+@keyframes tpf{0%,50%{transform:none}70%{transform:translate(26px,-30px) rotate(140deg)}100%{transform:translate(52px,58px) rotate(330deg)}}
+@keyframes spk{0%,30%{opacity:0}34%{opacity:1}56%,100%{opacity:0}}
+@keyframes jt{0%,31%{transform:none}35%{transform:translateY(1.5px)}40%{transform:translateY(-1px)}45%,100%{transform:none}}
+@media(prefers-reduced-motion:reduce){.k,.tp,.s,.sp,.jt{animation-duration:.01s!important}}
+.res{text-align:center;border:2px solid;border-radius:4px;padding:14px;margin-top:10px}
+.res.ok{border-color:var(--gn);color:var(--gn)}.res.bad{border-color:var(--rd);color:var(--rd)}
+.res h3{font-size:26px;color:inherit;margin:0}.res .ic{font-size:13px;font-weight:600;color:inherit;margin:0 0 8px}.res p{color:var(--tx);font-size:14px}
+[hidden]{display:none!important}
+@media(max-width:700px){.g{grid-template-columns:1fr}form{grid-template-columns:1fr}.hero{padding:30px 0}}
+</style>
+</head>
+<body>
+<nav><div class="w">
+ <b>Cake<i style="color:#9acd32;font-style:normal">Or</i>Fake</b>
+ <button id="n-home" onclick="go('home')"></button>
+ <button id="n-report" onclick="go('report')"></button>
+ <button id="n-mine" onclick="go('mine')"></button>
+ <button id="n-help" onclick="go('help')"></button>
+ <button id="n-contact" onclick="go('contact')"></button>
+ <select id="lang" aria-label="Language" onchange="setLang(this.value)"><option value="en">English</option><option value="hi">हिन्दी</option><option value="mr">मराठी</option></select>
+</div></nav>
+<div class="hero" id="hero"><div class="w">
+ <h1 class="logo" aria-label="CakeOrFake"><span class="c">Cake</span><span class="o">Or</span><span class="f">Fake</span></h1><p id="hs"></p><button class="btn" id="hb" onclick="go('home',1)"></button>
+</div></div>
+<main class="w">
+ <section id="p-home"><div class="panel"><h3 data-t="ak"></h3><textarea id="aq"></textarea><div class="row"><button class="btn p" onclick="ask()" data-t="ab"></button></div><div id="ao" style="white-space:pre-wrap;margin-top:10px"></div></div><h2><span id="h2a"></span> <small id="h2b"></small></h2><div class="g" id="grid"></div></section>
+ <section id="p-cat" hidden></section>
+ <section id="p-report" hidden>
+  <h2 id="rh"></h2>
+  <form onsubmit="return save(event)">
+   <div class="f"><label for="cat" data-t="lc"></label><select id="cat" onchange="items()"></select></div>
+   <div class="f"><label for="item" data-t="li"></label><select id="item"></select></div>
+   <div class="f"><label for="brand" data-t="lb"></label><input id="brand" autocomplete="off"></div>
+   <div class="f"><label for="pk" data-t="lp"></label><select id="pk"><option>Branded, sealed</option><option>Loose or unbranded</option></select></div>
+   <div class="f"><label for="shop" data-t="ls"></label><input id="shop" autocomplete="off"></div>
+   <div class="f"><label for="st" data-t="lsx"></label><select id="st" required></select></div>
+   <div class="f"><label for="di" data-t="ld"></label><input id="di" required autocomplete="off"></div>
+   <div class="f"><label for="ar" data-t="la"></label><input id="ar" required autocomplete="off"></div>
+   <div class="f"><label for="pin" data-t="lz"></label><input id="pin" inputmode="numeric" maxlength="6"><span class="er" id="pe"></span></div>
+   <div class="f"><label for="te" data-t="lx"></label><select id="te"></select></div>
+   <div class="f"><label for="rs" data-t="lr"></label><select id="rs"><option>Looks adulterated</option><option>Looks normal, but I am suspicious</option><option>Not tested yet</option></select></div>
+   <div class="f w2"><label for="de" data-t="lq"></label><textarea id="de"></textarea></div>
+   <div class="f w2"><button class="btn p" type="submit" data-t="sv" style="justify-self:start"></button></div>
+  </form>
+  <div id="db" hidden><div class="panel" style="margin-top:18px"><h3 data-t="dh"></h3>
+   <textarea id="dr" aria-label="Complaint"></textarea>
+   <div class="row"><button class="btn" onclick="cp()" data-t="cpy"></button><a class="btn" id="wa" target="_blank" rel="noopener" data-t="wa"></a><a class="btn" href="https://foscos.fssai.gov.in" target="_blank" rel="noopener" data-t="fs"></a></div><p id="cm" style="margin-top:8px"></p></div></div>
+ </section>
+ <section id="p-mine" hidden><h2 id="mh"></h2><p id="mn" style="color:var(--mu)"></p><div class="panel" id="ml"></div></section>
+ <section id="p-help" hidden><h2 id="hh"></h2><ol id="hl" style="padding-left:20px"></ol><div class="note" id="n1"></div><div class="note" id="n2"></div></section>
+<section id="p-contact" hidden><h2 id="ch"></h2><div class="panel" id="cl"></div><p id="cnt" style="color:var(--mu)"></p></section>
+</main>
+<script>
+/* AI bridge: uses Claude's built-in connection when it exists, otherwise this site's own /api/ai */
+if(!window.claude){
+ const b64=b=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(',')[1]);r.onerror=no;r.readAsDataURL(b)});
+ const sm=async(input,o={})=>{
+  const body={prompt:typeof input==='string'?input:input.map(m=>m.content).join('\n')};
+  if(o.images&&o.images[0])body.image=await b64(o.images[0]);
+  const r=await fetch('/api/ai',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+  if(!r.ok)throw new Error('ai '+r.status);
+  const d=await r.json();
+  return {text:d.text||'',truncated:false};
+ };
+ sm.json=async p=>{const r=await sm(p);return JSON.parse(r.text.replace(/```json|```/g,'').trim())};
+ sm.limits=async()=>({images:true});
+ window.claude={use:async n=>n==='sample'?sm:null};
+}
+</script>
+<script>
+const LN={hi:'Hindi',mr:'Marathi'};
+const T={
+en:{home:'Home',report:'Report',mine:'My reports',help:'Get help',hs:'Check your food. Report adulteration. Get help.',hb:'Check now',ak:'Describe your problem',ap:'Example: My turmeric turns the water bright yellow. Or: the milk smells like soap.',ab:'Get advice',af:'Could not get advice now. Please try again, or use the tests below.',rp2:'Make a complaint from this',hy:'How is your food?',lk:'How does it look?',sm:'How does it smell?',lo:['Normal','Colour looks different','Has specks, dirt or sediment','Separates into layers','Too thin or too thick','Packet looks opened or damaged'],so:['Normal and fresh','Soapy or chemical','Sour or rotten','Burnt or oily','Very weak or no smell'],ck:'Check',v0:'You told us about no warning signs. This does not prove the food is pure. Try the home tests below.',v1:'You noticed a warning sign. Try the home tests below. If the result looks bad, stop using it and report it.',ph:'Add a photo',sc:'Check the photo',pn0:'Please choose a photo first.',pf:'Could not check the photo now. Please try again.',pnote:'A photo cannot prove food is pure. It only looks for warning signs you can see.',h2a:'Check your food',h2b:'Pick a food group',ad:'What may be mixed in',ht:'Home test',lt:'Lab test',nd:'You need',dd:'What to do',sg:'What you see',rp:'Report this food',see:'See tests',back:'Back',lc:'Food group',li:'Food item',lb:'Brand name',lp:'Packing',ls:'Shop name (optional)',lx:'Test you tried',lr:'Result',lq:'Details (optional)',la:'Area or locality',ld:'District or city',lz:'PIN code',lsx:'State or UT',sv:'Save report and make complaint',dh:'Your complaint',cpy:'Copy text',wa:'Share on WhatsApp',fs:'Open FSSAI portal',cd:'Copied.',cf:'Press and hold the text to copy.',rh:'Report suspected adulteration',mh:'My reports',mn:'Saved on this device only.',em:'No reports yet.',vw:'View',dl:'Delete',sl:'Select state',nt:'No test done',pe:'Enter a valid 6-digit PIN code.',tr:'Translating…',tf:'Translation not available. Showing English.',hh:'How to get action',ic:'It’s cake!!',pt:'Possible tests',tt:'Possible tests for',q3:'Can you do these tests at home?',contact:'Contacts',ch:'Food safety contacts',cn:'FSSAI head office: FDA Bhawan, Kotla Road, near Bal Bhawan, New Delhi 110002. Numbers and emails can change. Confirm on fssai.gov.in.',s1:'Step 1: Tell us about your food',cont:'Continue',q2:'Step 2: Can you do the home tests below?',yes:'Yes, I can do them',no:'No, I cannot',s3:'Step 3: Do the tests and tell us what you saw',tn:'Not done',tpn:'Normal result',twn:'Warning sign',sr:'Show result',dn:'Please do at least one test and choose what you saw.',jg:'Checking your description and photo…',real:'Unadulterated',fake:'Possible adulteration',rn:'This is only an indication from what you told us. A photo or home test cannot fully prove food is pure. Only a lab test can confirm.',
+ hl:['Stop using it. If anyone feels unwell, see a doctor.','Keep proof: packet or sample in a clean sealed container, bill, batch number, photos.','Complain to your district Food Safety Officer or on FSSAI Food Safety Connect. FSSAI helpline has been 1800-11-2100; confirm on fssai.gov.in.','Get it tested at an FSSAI-notified lab. A buyer can have food analysed for a fee under the Food Safety and Standards Act.'],
+ n1:'Home tests are only indicators. Only a lab result counts for legal action.',n2:'Never taste a suspect sample. Tests with acids belong in a lab.'},
+hi:{home:'होम',report:'शिकायत',mine:'मेरी रिपोर्ट',help:'मदद',hs:'अपना खाना जाँचें। मिलावट की शिकायत करें। मदद पाएँ।',hb:'अभी जाँचें',ak:'अपनी समस्या बताएँ',ap:'जैसे: हल्दी पानी में डालते ही गहरी पीली हो जाती है। या: दूध से साबुन जैसी गंध आती है।',ab:'सलाह लें',af:'अभी सलाह नहीं मिल पाई। दोबारा कोशिश करें या नीचे दी गई जाँच देखें।',rp2:'इससे शिकायत बनाएँ',hy:'आपका खाना कैसा है?',lk:'यह कैसा दिखता है?',sm:'इसकी गंध कैसी है?',lo:['सामान्य','रंग अलग लगता है','कण, गंदगी या तलछट है','परतों में अलग हो जाता है','बहुत पतला या बहुत गाढ़ा','पैकेट खुला या खराब लगता है'],so:['सामान्य और ताज़ी','साबुन या केमिकल जैसी','खट्टी या सड़ी','जली या चिकनाई जैसी','बहुत हल्की या बिल्कुल नहीं'],ck:'जाँचें',v0:'आपने कोई चेतावनी का संकेत नहीं बताया। इससे यह साबित नहीं होता कि खाना शुद्ध है। नीचे दी गई घरेलू जाँच करें।',v1:'आपने चेतावनी का संकेत देखा है। नीचे दी गई घरेलू जाँच करें। नतीजा खराब आए तो इस्तेमाल बंद करें और शिकायत करें।',ph:'फ़ोटो जोड़ें',sc:'फ़ोटो जाँचें',pn0:'पहले एक फ़ोटो चुनें।',pf:'फ़ोटो की जाँच अभी नहीं हो पाई। दोबारा कोशिश करें।',pnote:'फ़ोटो से शुद्धता साबित नहीं हो सकती। यह सिर्फ़ दिखने वाले चेतावनी संकेत देखता है।',h2a:'अपना खाना जाँचें',h2b:'खाद्य समूह चुनें',ad:'क्या मिलाया जा सकता है',ht:'घरेलू जाँच',lt:'लैब जाँच',nd:'ज़रूरी सामान',dd:'क्या करें',sg:'क्या दिखेगा',rp:'इस खाद्य की शिकायत करें',see:'जाँच देखें',back:'वापस',lc:'खाद्य समूह',li:'खाद्य पदार्थ',lb:'ब्रांड का नाम',lp:'पैकिंग',ls:'दुकान का नाम (वैकल्पिक)',lx:'आपने कौन-सी जाँच की',lr:'नतीजा',lq:'विवरण (वैकल्पिक)',la:'इलाका या मोहल्ला',ld:'ज़िला या शहर',lz:'पिन कोड',lsx:'राज्य या केंद्रशासित प्रदेश',sv:'रिपोर्ट सहेजें और शिकायत बनाएँ',dh:'आपकी शिकायत',cpy:'टेक्स्ट कॉपी करें',wa:'व्हाट्सऐप पर भेजें',fs:'FSSAI पोर्टल खोलें',cd:'कॉपी हो गया।',cf:'कॉपी करने के लिए टेक्स्ट को दबाए रखें।',rh:'संदिग्ध मिलावट की शिकायत करें',mh:'मेरी रिपोर्ट',mn:'सिर्फ़ इसी डिवाइस पर सहेजी गई हैं।',em:'अभी कोई रिपोर्ट नहीं।',vw:'देखें',dl:'हटाएँ',sl:'राज्य चुनें',nt:'कोई जाँच नहीं की',pe:'सही 6 अंकों का पिन कोड डालें।',tr:'अनुवाद हो रहा है…',tf:'अनुवाद उपलब्ध नहीं। अंग्रेज़ी दिखाई जा रही है।',hh:'कार्रवाई कैसे करवाएँ',ic:'यह केक है!!',pt:'संभावित जाँच',tt:'संभावित जाँच',q3:'क्या आप ये जाँच घर पर कर सकते हैं?',contact:'संपर्क',ch:'खाद्य सुरक्षा संपर्क',cn:'FSSAI मुख्यालय: एफ.डी.ए. भवन, कोटला रोड, बाल भवन के पास, नई दिल्ली 110002। नंबर और ईमेल बदल सकते हैं। fssai.gov.in पर पुष्टि करें।',s1:'चरण 1: अपने खाने के बारे में बताएँ',cont:'आगे बढ़ें',q2:'चरण 2: क्या आप नीचे दी गई घरेलू जाँच कर सकते हैं?',yes:'हाँ, कर सकता/सकती हूँ',no:'नहीं, नहीं कर सकता/सकती',s3:'चरण 3: जाँच करें और बताएँ कि क्या दिखा',tn:'नहीं की',tpn:'सामान्य नतीजा',twn:'चेतावनी का संकेत',sr:'नतीजा देखें',dn:'कृपया कम से कम एक जाँच करें और बताएँ कि क्या दिखा।',jg:'आपका विवरण और फ़ोटो जाँचा जा रहा है…',real:'मिलावट-रहित',fake:'मिलावट की संभावना',rn:'यह सिर्फ़ आपकी बताई बातों पर आधारित संकेत है। फ़ोटो या घरेलू जाँच से शुद्धता पूरी तरह साबित नहीं होती। सिर्फ़ लैब जाँच से पुष्टि होती है।',
+ hl:['इसका इस्तेमाल बंद करें। किसी की तबीयत बिगड़े तो डॉक्टर को दिखाएँ।','सबूत रखें: पैकेट या नमूना साफ़ बंद डिब्बे में, बिल, बैच नंबर, फ़ोटो।','अपने ज़िले के खाद्य सुरक्षा अधिकारी या FSSAI Food Safety Connect पर शिकायत करें। FSSAI हेल्पलाइन 1800-11-2100 रही है; fssai.gov.in पर पुष्टि करें।','FSSAI से अधिसूचित लैब में जाँच करवाएँ। खाद्य सुरक्षा एवं मानक अधिनियम के तहत खरीदार शुल्क देकर जाँच करवा सकता है।'],
+ n1:'घरेलू जाँच सिर्फ़ संकेत देती है। कानूनी कार्रवाई के लिए सिर्फ़ लैब रिपोर्ट मान्य है।',n2:'संदिग्ध नमूना कभी न चखें। एसिड वाली जाँच लैब में ही करें।'},
+mr:{home:'मुख्यपृष्ठ',report:'तक्रार',mine:'माझे अहवाल',help:'मदत',hs:'तुमचे अन्न तपासा. भेसळीची तक्रार करा. मदत मिळवा.',hb:'आता तपासा',ak:'तुमची समस्या सांगा',ap:'उदा.: हळद पाण्यात टाकताच गडद पिवळी होते. किंवा: दुधाला साबणासारखा वास येतो.',ab:'सल्ला घ्या',af:'आत्ता सल्ला मिळाला नाही. पुन्हा प्रयत्न करा किंवा खालील चाचण्या पहा.',rp2:'यावरून तक्रार तयार करा',hy:'तुमचे अन्न कसे आहे?',lk:'ते कसे दिसते?',sm:'त्याचा वास कसा आहे?',lo:['सामान्य','रंग वेगळा वाटतो','कण, घाण किंवा गाळ आहे','थरांमध्ये वेगळे होते','खूप पातळ किंवा खूप घट्ट','पाकीट उघडलेले किंवा खराब दिसते'],so:['सामान्य आणि ताजा','साबणासारखा किंवा रसायनासारखा','आंबट किंवा कुजलेला','जळका किंवा तेलकट','खूप कमी किंवा अजिबात नाही'],ck:'तपासा',v0:'तुम्ही धोक्याची कोणतीही खूण सांगितली नाही. यावरून अन्न शुद्ध आहे असे सिद्ध होत नाही. खालील घरगुती चाचण्या करा.',v1:'तुम्हाला धोक्याची खूण दिसली आहे. खालील घरगुती चाचण्या करा. निकाल वाईट आला तर वापर थांबवा आणि तक्रार करा.',ph:'फोटो जोडा',sc:'फोटो तपासा',pn0:'आधी एक फोटो निवडा.',pf:'फोटो तपासता आला नाही. पुन्हा प्रयत्न करा.',pnote:'फोटोवरून शुद्धता सिद्ध होत नाही. हे फक्त दिसणाऱ्या धोक्याच्या खुणा पाहते.',h2a:'तुमचे अन्न तपासा',h2b:'अन्न गट निवडा',ad:'काय मिसळले जाऊ शकते',ht:'घरगुती चाचणी',lt:'लॅब चाचणी',nd:'लागणारे साहित्य',dd:'काय करावे',sg:'काय दिसेल',rp:'या अन्नाची तक्रार करा',see:'चाचण्या पहा',back:'मागे',lc:'अन्न गट',li:'अन्नपदार्थ',lb:'ब्रँडचे नाव',lp:'पॅकिंग',ls:'दुकानाचे नाव (ऐच्छिक)',lx:'तुम्ही कोणती चाचणी केली',lr:'निकाल',lq:'तपशील (ऐच्छिक)',la:'परिसर किंवा भाग',ld:'जिल्हा किंवा शहर',lz:'पिन कोड',lsx:'राज्य किंवा केंद्रशासित प्रदेश',sv:'अहवाल जतन करा आणि तक्रार तयार करा',dh:'तुमची तक्रार',cpy:'मजकूर कॉपी करा',wa:'व्हॉट्सअ‍ॅपवर पाठवा',fs:'FSSAI पोर्टल उघडा',cd:'कॉपी झाले.',cf:'कॉपी करण्यासाठी मजकूर दाबून धरा.',rh:'संशयित भेसळीची तक्रार करा',mh:'माझे अहवाल',mn:'फक्त याच डिव्हाइसवर जतन केले आहेत.',em:'अजून अहवाल नाहीत.',vw:'पहा',dl:'हटवा',sl:'राज्य निवडा',nt:'चाचणी केली नाही',pe:'योग्य 6 अंकी पिन कोड टाका.',tr:'भाषांतर होत आहे…',tf:'भाषांतर उपलब्ध नाही. इंग्रजी दाखवले आहे.',hh:'कारवाई कशी करून घ्यावी',ic:'हा केक आहे!!',pt:'संभाव्य चाचण्या',tt:'संभाव्य चाचण्या',q3:'तुम्ही या चाचण्या घरी करू शकता का?',contact:'संपर्क',ch:'अन्न सुरक्षा संपर्क',cn:'FSSAI मुख्यालय: एफ.डी.ए. भवन, कोटला रोड, बाल भवनाजवळ, नवी दिल्ली 110002. क्रमांक आणि ईमेल बदलू शकतात. fssai.gov.in वर खात्री करा.',s1:'पायरी 1: तुमच्या अन्नाबद्दल सांगा',cont:'पुढे जा',q2:'पायरी 2: तुम्ही खालील घरगुती चाचण्या करू शकता का?',yes:'हो, करू शकतो/शकते',no:'नाही, करू शकत नाही',s3:'पायरी 3: चाचण्या करा आणि काय दिसले ते सांगा',tn:'केली नाही',tpn:'सामान्य निकाल',twn:'धोक्याची खूण',sr:'निकाल पहा',dn:'कृपया किमान एक चाचणी करा आणि काय दिसले ते निवडा.',jg:'तुमचे वर्णन आणि फोटो तपासले जात आहे…',real:'भेसळमुक्त',fake:'भेसळीची शक्यता',rn:'हे फक्त तुम्ही सांगितलेल्या गोष्टींवर आधारित संकेत आहे. फोटो किंवा घरगुती चाचणीने शुद्धता पूर्णपणे सिद्ध होत नाही. फक्त लॅब चाचणीने खात्री होते.',
+ hl:['त्याचा वापर थांबवा. कोणाला त्रास झाला तर डॉक्टरांना दाखवा.','पुरावा ठेवा: पाकीट किंवा नमुना स्वच्छ बंद डब्यात, बिल, बॅच क्रमांक, फोटो.','तुमच्या जिल्ह्याच्या अन्न सुरक्षा अधिकाऱ्याकडे किंवा FSSAI Food Safety Connect वर तक्रार करा. FSSAI हेल्पलाइन 1800-11-2100 होती; fssai.gov.in वर खात्री करा.','FSSAI ने मान्यता दिलेल्या लॅबमध्ये तपासणी करा. अन्न सुरक्षा व मानके कायद्याखाली खरेदीदार शुल्क भरून तपासणी करू शकतो.'],
+ n1:'घरगुती चाचण्या फक्त सूचक असतात. कायदेशीर कारवाईसाठी फक्त लॅब अहवाल ग्राह्य असतो.',n2:'संशयित नमुना कधीही चाखू नका. आम्लाच्या चाचण्या लॅबमध्येच करा.'}};
+// [name, kind, need, do, sign]
+const C=[
+{id:'milk',n:['Milk','दूध','दूध'],it:['Loose milk','Packet milk','Toned or skimmed milk','Cow milk','Buffalo milk'],ad:'Water, starch, soap or detergent, urea',
+t:[['Water in milk','h','A tilted steel plate or tile. A spoon of milk.','Put one drop at the top of the plate. Watch how it runs down.','Pure milk runs slowly and leaves a white line. Milk with water runs fast and leaves no line.'],
+['Starch in milk','h','Milk, water, iodine from a chemist shop, a small pan.','Boil half a teaspoon of milk with half a teaspoon of water. Let it cool. Add 2 drops of iodine.','If it turns blue, starch is mixed in.'],
+['Soap or detergent in milk','h','A clear bottle with a lid. Milk and water.','Put 1 teaspoon of milk and 1 teaspoon of water in the bottle. Shake hard for 30 seconds. Wait one minute.','A thick foam that stays means detergent. Pure milk gives a thin foam that goes away fast.'],
+['Urea or fake milk','l','','Take a sealed sample to an FSSAI-approved lab. A soapy feel is only a hint.','']]},
+{id:'dairy',n:['Dairy products','दुग्ध उत्पाद','दुग्धजन्य पदार्थ'],it:['Paneer','Khoa or mawa','Curd or dahi','Buttermilk (chaas)','Butter','Cream','Cheese'],ad:'Starch, cheap fat, fake ingredients',
+t:[['Starch in paneer, khoa or curd','h','A small piece of the food. Water. Iodine.','Boil the piece in water for one minute. Let it cool. Add a few drops of iodine.','Blue or purple means starch. Pure paneer or khoa stays brown.'],
+['Rubbery paneer','h','A piece of paneer. A pan of hot water.','Cook the piece in hot water for 5 minutes. Then press it.','Good paneer stays soft. Very rubbery or sticky paneer is suspicious. This is only a hint.'],
+['Cheap fat in butter or cheese','l','','Only a lab can find out what fat was used.','']]},
+{id:'ghee',n:['Ghee','घी','तूप'],it:['Cow ghee','Buffalo ghee','Desi ghee (loose)','Packaged ghee'],ad:'Vanaspati, palm or animal fat, boiled potato',
+t:[['Starch in ghee','h','A spoon of melted ghee. Warm water. Iodine.','Mix the ghee with a little warm water. Add 2 drops of iodine.','Blue colour means potato or other starch is mixed in.'],
+['Cooling check','h','A spoon of ghee. A small bowl. A fridge.','Melt the ghee in the bowl. Keep it in the fridge for 30 minutes.','Pure ghee sets evenly and looks grainy. Layers or a waxy look are suspicious. This is only a hint.'],
+['Vanaspati test','l','','This test uses strong acid. Do it only in a lab. A red colour means vanaspati.','']]},
+{id:'oil',n:['Edible oils','खाद्य तेल','खाद्यतेल'],it:['Mustard oil','Groundnut oil','Sunflower oil','Soybean oil','Coconut oil','Sesame (til) oil','Palm oil','Refined oil'],ad:'Argemone oil, mineral oil, cheaper oil, colour',
+t:[['Cheaper oil in coconut oil','h','A small glass bottle of coconut oil. A fridge.','Keep the bottle in the fridge for one hour.','Pure coconut oil turns solid. If it stays liquid or makes layers, other oil may be mixed in. This is only a hint.'],
+['Smell and colour','h','A spoon of oil on a white plate.','Warm it a little. Smell it. Look at the colour.','A chemical or burnt smell, or a very bright colour, is a warning. Report it.'],
+['Argemone oil in mustard oil','l','','This oil can cause a serious illness called epidemic dropsy. The test needs strong acid, so do it only in a lab.','']]},
+{id:'honey',n:['Honey','शहद','मध'],it:['Branded honey','Loose honey','Forest honey','Multiflora honey'],ad:'Sugar syrup, jaggery syrup, water',
+t:[['Water drop test','h','A glass of still water. A spoon of honey.','Drop the honey slowly into the water. Do not stir.','Pure honey sinks in a lump. Fake honey spreads and mixes fast. This test is not very strong.'],
+['Cotton wick test','h','A cotton wick. Honey. Matches.','Cover the wick with honey. Try to light it.','Pure honey lets the wick burn. Crackling or no flame means there is water in it. This test is not very strong.'],
+['Syrup in honey','l','','New syrups pass home tests. Only a lab can find them.','']]},
+{id:'spice',n:['Spices','मसाले','मसाले'],it:['Turmeric (haldi) powder','Red chilli powder','Coriander powder','Cumin (jeera)','Black pepper','Garam masala','Hing (asafoetida)'],ad:'Harmful colours, brick powder, sawdust, chalk, papaya seeds',
+t:[['Colour in turmeric','h','A clear glass of water. A spoon of turmeric.','Sprinkle the turmeric on the water. Do not stir. Wait 5 minutes.','Pure turmeric sinks slowly and the water turns light yellow. Dyed turmeric turns the water bright yellow at once.'],
+['Brick powder or colour in chilli','h','A glass of water. A spoon of chilli powder.','Sprinkle the powder on the water.','Chilli floats. Brick powder sinks like sand. Red streaks that spread fast mean added colour.'],
+['Chalk in spice powders','h','Spice powder. Vinegar or lemon juice.','Put a spoon of powder in a bowl. Add a few drops of vinegar.','If it fizzes, chalk is mixed in.'],
+['Papaya seeds in black pepper','h','A glass of water. A few peppercorns.','Drop the peppercorns into the water.','Real pepper sinks. Papaya seeds float.'],
+['Harmful colours (Sudan, metanil yellow)','l','','Only a lab can confirm these colours.','']]},
+{id:'pulse',n:['Pulses','दालें','डाळी'],it:['Toor or arhar dal','Moong dal','Chana dal','Masoor dal','Urad dal','Besan'],ad:'Kesari dal, added colour, stones and dust',
+t:[['Added colour in toor or chana dal','h','A handful of dal. A bowl of warm water.','Soak the dal for 10 minutes. Look at the water.','Yellow streaks in the water mean yellow colour was added.'],
+['Green colour in moong or peas','h','A few grains. A white tissue. A little water.','Wet the tissue. Rub the grains on it.','Green colour on the tissue means green dye was added.'],
+['Kesari dal in toor, chana or besan','h','A handful of dal on a white plate.','Spread the dal out. Look at each grain.','Grains shaped like a wedge with a flat side are kesari dal. Confirm in a lab.']]},
+{id:'tea',n:['Tea and coffee','चाय और कॉफ़ी','चहा आणि कॉफी'],it:['Tea leaves','Tea dust','Instant coffee','Coffee powder'],ad:'Used tea leaves, colour, iron bits, chicory',
+t:[['Colour in tea','h','Wet white paper or tissue. A spoon of tea.','Sprinkle the tea on the wet paper. Wait one minute.','Coloured spots or streaks mean colour was added.'],
+['Iron bits in tea','h','A magnet. A plate of tea.','Move the magnet slowly through the tea.','Black bits that stick to the magnet are iron.'],
+['Chicory in coffee','h','A glass of water. A spoon of coffee.','Sprinkle the coffee on the water.','Coffee floats. Chicory sinks and leaves brown streaks.']]},
+{id:'sugar',n:['Sugar, salt and jaggery','चीनी, नमक और गुड़','साखर, मीठ आणि गूळ'],it:['Sugar','Salt','Jaggery (gur)'],ad:'Chalk powder, washing soda, colour',
+t:[['Chalk in sugar or salt','h','A glass of water. A spoon of sugar or salt.','Stir the spoon in the water. Wait one minute.','Chalk makes the water cloudy and sinks to the bottom.'],
+['Washing soda in jaggery','h','A piece of jaggery. Vinegar.','Put a few drops of vinegar on the piece.','If it fizzes, washing soda or chalk is mixed in.'],
+['Iodine in salt','l','','Only a lab or a test kit can measure it.','']]}];
+const I={
+milk:'Milk can be mixed with water, starch, soap or detergent, and urea. Pure milk is white or creamy and a little thick. Milk with water looks thin and slightly blue. Milk with starch or detergent may look very white and foam a lot. Pure milk smells fresh and a little sweet. Fake milk may smell like soap or chemicals.',
+dairy:'Paneer, khoa, curd and butter can be mixed with starch, cheap fat or fake ingredients. Pure paneer is soft, white and crumbles a little. Mixed paneer may feel rubbery or sticky. Pure khoa, curd and butter smell fresh and milky. A sour, oily or chemical smell is a warning.',
+ghee:'Ghee can be mixed with vanaspati, palm or animal fat, or boiled potato. Pure ghee is golden or pale yellow and looks grainy when it sets. Mixed ghee may look too smooth, waxy or too bright yellow. Pure ghee has a rich, nutty smell. Very little smell, or a greasy smell, is a warning.',
+oil:'Edible oil can be mixed with argemone oil, mineral oil, cheaper oil or colour. Good oil is clear and has the normal colour for its type. Bad oil may look cloudy, too bright or have specks in it. Mustard oil smells sharp and coconut oil smells of coconut. A chemical or burnt smell is a warning.',
+honey:'Honey can be mixed with sugar syrup, jaggery syrup or water. Pure honey is thick and flows slowly in a thick stream. Fake honey may look thin, watery or too clear. Pure honey can also turn into sugar-like crystals in cold weather, so looks alone prove nothing. Pure honey smells of flowers. Fake honey may smell like plain sugar or have no smell.',
+spice:'Spices can be mixed with harmful colours, brick powder, sawdust, chalk or papaya seeds. Pure spices have an even colour. Mixed spices may look too bright, feel gritty or have bits of a different colour. Pure spices smell strong and natural. A weak smell or a chemical smell is a warning.',
+pulse:'Dal can be mixed with kesari dal, added colour, stones or dust. Pure dal has an even, natural colour. Coloured dal looks too bright and may stain your hands or the water. Kesari dal has wedge-shaped grains. Pure dal smells fresh and mild. A musty or chemical smell is a warning.',
+tea:'Tea and coffee can be mixed with used tea leaves, colour, iron bits or chicory. Pure tea gives its colour slowly. Fake tea gives colour very fast or leaves black bits. Pure coffee is dark brown. Pure tea and coffee smell strong and fresh. A weak or burnt smell is a warning.',
+sugar:'Sugar, salt and jaggery can be mixed with chalk powder, washing soda or colour. Pure sugar and salt are clean, dry and shiny. Mixed ones may look dull, powdery or lumpy. Jaggery that looks too pale or too bright is suspicious. Sugar and salt have almost no smell. Jaggery smells sweet. A chemical or soapy smell is a warning.'};
+const S='#7d8f99';
+const A={
+milk:`<ellipse cx="98" cy="101" rx="40" ry="5" fill="#0002"/><ellipse cx="156" cy="103" rx="22" ry="4" fill="#0002"/><path d="M66 28h64l-7 70q-1 5-6 5H79q-5 0-6-5z" fill="#fff" stroke="${S}" stroke-width="2.5"/><path d="M69 52h58l-4 46q-1 4-5 4H78q-4 0-5-4z" fill="#eef3ff"/><ellipse cx="98" cy="52" rx="29" ry="4" fill="#fff" stroke="#c9d6e6"/><ellipse cx="98" cy="28" rx="32" ry="4" fill="none" stroke="${S}" stroke-width="2.5"/><path d="M76 38l4 54" stroke="#fff" stroke-width="3.5" opacity=".9"/><rect x="141" y="46" width="30" height="56" rx="6" fill="#fff" stroke="${S}" stroke-width="2.5"/><rect x="149" y="30" width="14" height="18" fill="#fff" stroke="${S}" stroke-width="2.5"/><rect x="146" y="22" width="20" height="9" rx="2" fill="#3f78d0"/><rect x="141" y="62" width="30" height="24" fill="#3f78d0"/><path d="M148 74q8-9 16 0q-8 9-16 0z" fill="#fff"/><path d="M147 52v44" stroke="#fff" stroke-width="3" opacity=".7"/><circle cx="46" cy="90" r="4" fill="#fff" stroke="#c9d6e6"/><circle cx="34" cy="98" r="3" fill="#fff" stroke="#c9d6e6"/>`,
+dairy:`<ellipse cx="60" cy="97" rx="42" ry="5" fill="#0002"/><ellipse cx="150" cy="103" rx="30" ry="5" fill="#0002"/><g stroke="#bfa850" stroke-width="2"><path d="M22 66h34v30H22z" fill="#fbf1cf"/><path d="M22 66l8-10h34l-8 10z" fill="#fffbe6"/><path d="M56 66l8-10v30l-8 10z" fill="#e9d896"/><path d="M68 78h26v18H68z" fill="#fbf1cf"/><path d="M68 78l7-9h26l-7 9z" fill="#fffbe6"/><path d="M94 78l7-9v18l-7 9z" fill="#e9d896"/></g><path d="M118 70h64a32 30 0 0 1-64 0z" fill="#fff" stroke="${S}" stroke-width="2.5"/><ellipse cx="150" cy="70" rx="32" ry="6" fill="#fffdf1" stroke="#d9d4b8"/><path d="M138 66q12 4 24 0" fill="none" stroke="#e8e2c0" stroke-width="2"/><path d="M128 84q22 12 44 0" fill="none" stroke="#c9d6e6" stroke-width="2"/>`,
+ghee:`<ellipse cx="100" cy="102" rx="46" ry="5" fill="#0002"/><rect x="58" y="40" width="84" height="62" rx="12" fill="#e8b923" stroke="#b98a10" stroke-width="2"/><rect x="52" y="24" width="96" height="20" rx="5" fill="#8a5a1c"/><path d="M60 30v10M72 30v10M84 30v10M96 30v10M108 30v10M120 30v10M132 30v10M144 30v10" stroke="#6a4412" stroke-width="2"/><rect x="72" y="54" width="56" height="34" rx="4" fill="#fff7d6" stroke="#b98a10"/><text x="100" y="76" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="15" fill="#8a5a1c">GHEE</text><path d="M66 48v46" stroke="#fff" stroke-width="4" opacity=".5"/><path d="M166 70c6 9 9 13 9 17a9 9 0 0 1-18 0c0-4 3-8 9-17z" fill="#f2c94c" stroke="#b98a10"/>`,
+oil:`<ellipse cx="88" cy="103" rx="30" ry="5" fill="#0002"/><ellipse cx="150" cy="103" rx="26" ry="4" fill="#0002"/><rect x="60" y="48" width="56" height="54" rx="10" fill="#e0a516" stroke="#a97a0a" stroke-width="2"/><rect x="78" y="22" width="20" height="28" fill="#e0a516" stroke="#a97a0a" stroke-width="2"/><rect x="76" y="14" width="24" height="10" rx="2" fill="#5a3d0a"/><rect x="66" y="64" width="44" height="26" rx="3" fill="#fff5cc"/><path d="M88 68c5 7 7 10 7 13a7 7 0 0 1-14 0c0-3 2-6 7-13z" fill="#e0a516"/><path d="M68 52v46" stroke="#fff" stroke-width="4" opacity=".4"/><g fill="#f4d03f"><circle cx="140" cy="86" r="6"/><circle cx="152" cy="80" r="6"/><circle cx="164" cy="86" r="6"/><circle cx="152" cy="92" r="6"/></g><circle cx="152" cy="86" r="4" fill="#8a5a1c"/><path d="M152 98v6" stroke="#4a7a2a" stroke-width="3"/>`,
+honey:`<ellipse cx="90" cy="102" rx="42" ry="5" fill="#0002"/><rect x="50" y="40" width="80" height="62" rx="16" fill="#e59a12" stroke="#b36f00" stroke-width="2"/><rect x="56" y="24" width="68" height="18" rx="5" fill="#9a6b2b"/><path d="M62 30h56" stroke="#7a521c" stroke-width="2"/><path d="M90 56l12 7v14l-12 7-12-7V63z" fill="#fde8a4" stroke="#b36f00"/><path d="M58 50v46" stroke="#fff" stroke-width="4" opacity=".4"/><path d="M146 30v50" stroke="#a0703a" stroke-width="6" stroke-linecap="round"/><ellipse cx="146" cy="88" rx="12" ry="9" fill="#e59a12" stroke="#a0703a" stroke-width="2"/><path d="M134 88h24M137 83h18M137 93h18" stroke="#a0703a" stroke-width="1.5"/><g fill="#f6c23e" stroke="#b36f00"><path d="M172 66l7 4v8l-7 4-7-4v-8z"/><path d="M186 74l7 4v8l-7 4-7-4v-8z"/><path d="M172 82l7 4v8l-7 4-7-4v-8z"/></g>`,
+spice:`<ellipse cx="100" cy="102" rx="90" ry="5" fill="#0002"/><path d="M12 100a31 28 0 0 1 62 0z" fill="#e8b100" stroke="#b58300" stroke-width="2"/><path d="M69 100a31 30 0 0 1 62 0z" fill="#c4281c" stroke="#8f1d0c" stroke-width="2"/><path d="M126 100a31 26 0 0 1 62 0z" fill="#7a5230" stroke="#523419" stroke-width="2"/><path d="M26 82q12-6 22 0M82 78q14-6 26 0M140 84q12-6 22 0" fill="none" stroke="#fff" stroke-width="2" opacity=".35"/><path d="M26 30q22 8 30 36" fill="none" stroke="#c4281c" stroke-width="7" stroke-linecap="round"/><path d="M26 30q-3-6-8-6" fill="none" stroke="#3a7a2a" stroke-width="3"/><ellipse cx="134" cy="38" rx="14" ry="6" fill="#d9951a" stroke="#a96a0a" stroke-width="2" transform="rotate(-20 134 38)"/><circle cx="168" cy="40" r="5" fill="#2b2b2b"/><circle cx="178" cy="46" r="5" fill="#2b2b2b"/><circle cx="170" cy="52" r="5" fill="#2b2b2b"/>`,
+pulse:`<ellipse cx="100" cy="103" rx="70" ry="5" fill="#0002"/><path d="M36 56h128a64 48 0 0 1-128 0z" fill="#b87a45" stroke="#8a5528" stroke-width="2"/><path d="M50 74q50 14 100 0" fill="none" stroke="#9a6334" stroke-width="2"/><ellipse cx="100" cy="56" rx="64" ry="8" fill="#8a5528"/><g fill="#e8c23a" stroke="#b8941a"><circle cx="60" cy="50" r="8"/><circle cx="76" cy="46" r="8"/><circle cx="92" cy="43" r="8"/><circle cx="108" cy="43" r="8"/><circle cx="124" cy="46" r="8"/><circle cx="140" cy="50" r="8"/><circle cx="84" cy="34" r="8"/><circle cx="100" cy="31" r="8"/><circle cx="116" cy="34" r="8"/></g><g fill="#7bb661" stroke="#4e8a3a"><circle cx="100" cy="21" r="7"/><circle cx="14" cy="96" r="6"/><circle cx="24" cy="100" r="6"/></g><g fill="#e8c23a" stroke="#b8941a"><circle cx="176" cy="98" r="6"/><circle cx="188" cy="94" r="6"/></g>`,
+tea:`<ellipse cx="100" cy="103" rx="60" ry="5" fill="#0002"/><ellipse cx="96" cy="92" rx="52" ry="9" fill="#fff" stroke="${S}" stroke-width="2.5"/><path d="M60 48h74v28a37 20 0 0 1-74 0z" fill="#fff" stroke="${S}" stroke-width="2.5"/><ellipse cx="97" cy="48" rx="37" ry="7" fill="#b5651d" stroke="${S}" stroke-width="2.5"/><path d="M134 54h8a13 13 0 0 1 0 26h-12" fill="none" stroke="${S}" stroke-width="3"/><path d="M68 56v18" stroke="#fff" stroke-width="3.5" opacity=".8"/><path d="M84 36q-6-8 0-14t0-12M104 36q-6-8 0-14t0-12" fill="none" stroke="#aab" stroke-width="2.5" stroke-linecap="round"/><ellipse cx="28" cy="88" rx="14" ry="6" fill="#5a9a3a" stroke="#3d7a22" transform="rotate(-25 28 88)"/><path d="M16 94l24-12" stroke="#3d7a22"/><g fill="#5a3d28" stroke="#3a2412"><ellipse cx="170" cy="86" rx="6" ry="8"/><ellipse cx="184" cy="92" rx="6" ry="8"/><ellipse cx="172" cy="100" rx="6" ry="7"/></g>`,
+sugar:`<ellipse cx="100" cy="103" rx="88" ry="5" fill="#0002"/><g stroke="#8f9aa8" stroke-width="2"><path d="M20 70h28v28H20z" fill="#fff"/><path d="M20 70l7-8h28l-7 8z" fill="#fafcff"/><path d="M48 70l7-8v28l-7 8z" fill="#e4e9f0"/><path d="M58 80h24v18H58z" fill="#fff"/><path d="M58 80l6-7h24l-6 7z" fill="#fafcff"/><path d="M82 80l6-7v18l-6 7z" fill="#e4e9f0"/><path d="M34 62h28v-0z" fill="none"/></g><path d="M104 60h54a8 8 0 0 1 8 8v26a8 8 0 0 1-8 8h-54a8 8 0 0 1-8-8V68a8 8 0 0 1 8-8z" fill="#9a5b1f" stroke="#6a3a0e" stroke-width="2"/><path d="M110 70l16 8 14-10M130 98l6-16" fill="none" stroke="#6a3a0e" stroke-width="2"/><path d="M104 66h54" stroke="#b97a3a" stroke-width="3"/><path d="M178 56h14l3 12v28a4 4 0 0 1-4 4h-12a4 4 0 0 1-4-4V68z" fill="#fff" stroke="#8f9aa8" stroke-width="2"/><circle cx="182" cy="62" r="1.5" fill="#8f9aa8"/><circle cx="188" cy="62" r="1.5" fill="#8f9aa8"/><circle cx="185" cy="66" r="1.5" fill="#8f9aa8"/>`};
+const art=id=>`<svg viewBox="0 0 200 110" role="img" aria-label="${id}"><rect width="200" height="110" fill="#e9eef0"/>${A[id]}</svg>`;
+const STATES='Andhra Pradesh,Arunachal Pradesh,Assam,Bihar,Chhattisgarh,Goa,Gujarat,Haryana,Himachal Pradesh,Jharkhand,Karnataka,Kerala,Madhya Pradesh,Maharashtra,Manipur,Meghalaya,Mizoram,Nagaland,Odisha,Punjab,Rajasthan,Sikkim,Tamil Nadu,Telangana,Tripura,Uttar Pradesh,Uttarakhand,West Bengal,Andaman and Nicobar Islands,Chandigarh,Dadra and Nagar Haveli and Daman and Diu,Delhi,Jammu and Kashmir,Ladakh,Lakshadweep,Puducherry'.split(',');
+const $=id=>document.getElementById(id);
+const E=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let lang='en',page='home',cur=null,R=[],cd=null;
+try{R=JSON.parse(localStorage.getItem('cf_reports')||'[]');lang=localStorage.getItem('cf_lang')||'en'}catch(e){}
+const t=k=>(T[lang][k]||T.en[k]||'');
+const cat=id=>C.find(c=>c.id===id);
+const cn=c=>c.n[['en','hi','mr'].indexOf(lang)];
+const store=()=>{try{localStorage.setItem('cf_reports',JSON.stringify(R))}catch(e){}};
+
+function go(p,top){
+ page=p;
+ ['home','cat','report','mine','help','contact'].forEach(x=>$('p-'+x).hidden=x!==p);
+ ['home','report','mine','help','contact'].forEach(x=>$('n-'+x).className=(x===p||(p==='cat'&&x==='home'))?'on':'');
+ $('hero').hidden=p!=='home';
+ if(p==='mine')renderMine();
+ if(top)$('p-home').scrollIntoView();else window.scrollTo(0,0);
+}
+function setLang(l){lang=l;try{localStorage.setItem('cf_lang',l)}catch(e){}paint()}
+function paint(){
+ $('lang').value=lang;document.documentElement.lang=lang;
+ ['home','report','mine','help','contact'].forEach(x=>$('n-'+x).textContent=t(x));
+ $('ch').textContent=t('ch');$('cnt').textContent=t('cn');const li=['en','hi','mr'].indexOf(lang);
+ $('cl').innerHTML=CT.map(r=>`<div class="rep"><b>${E(r[li])}</b><br><a href="${r[3]}"${r[3][0]=='h'?' target="_blank" rel="noopener"':''} style="color:var(--lk)">${E(r[4])}</a></div>`).join('');
+ $('hs').textContent=t('hs');$('hb').textContent=t('hb');$('aq').placeholder=t('ap');$('h2a').textContent=t('h2a');$('h2b').textContent=t('h2b');
+ $('grid').innerHTML=C.map(c=>`<div class="card">${art(c.id)}<h3>${E(cn(c))}</h3><button class="btn" onclick="open_('${c.id}')">${t('see')}</button></div>`).join('');
+ document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t(e.dataset.t));
+ $('rh').textContent=t('rh');$('mh').textContent=t('mh');$('mn').textContent=t('mn');$('hh').textContent=t('hh');
+ $('hl').innerHTML=t('hl').map(x=>`<li>${E(x)}</li>`).join('');$('n1').textContent=t('n1');$('n2').textContent=t('n2');
+ const cv=$('cat').value||'milk';
+ $('cat').innerHTML=C.map(c=>`<option value="${c.id}">${E(cn(c))}</option>`).join('');$('cat').value=cv;
+ const sv=$('st').value;$('st').innerHTML=`<option value="">${t('sl')}</option>`+STATES.map(s=>`<option>${E(s)}</option>`).join('');$('st').value=sv;
+ items();
+ if(page==='cat'&&cur)open_(cur,1);
+ if(page==='mine')renderMine();
+}
+function items(){
+ const c=cat($('cat').value);
+ $('item').innerHTML=c.it.map(i=>`<option>${E(i)}</option>`).join('');
+ $('te').innerHTML=`<option value="">${t('nt')}</option>`+c.t.map(x=>`<option>${E(x[0])}</option>`).join('');
+}
+const CT=[
+['FSSAI toll-free helpline (24x7)','FSSAI टोल-फ़्री हेल्पलाइन (24x7)','FSSAI टोल-फ्री हेल्पलाइन (24x7)','tel:1800112100','1800-112-100'],
+['FSSAI complaint email','FSSAI शिकायत ईमेल','FSSAI तक्रार ईमेल','mailto:compliance@fssai.gov.in','compliance@fssai.gov.in'],
+['Food Safety Connect (online complaint)','फ़ूड सेफ़्टी कनेक्ट (ऑनलाइन शिकायत)','फूड सेफ्टी कनेक्ट (ऑनलाइन तक्रार)','https://foscos.fssai.gov.in/consumergrievance','foscos.fssai.gov.in'],
+['State Food Safety Commissioners (find yours)','राज्य खाद्य सुरक्षा आयुक्त (अपना ढूँढें)','राज्य अन्न सुरक्षा आयुक्त (तुमचे शोधा)','https://www.fssai.gov.in/cms/commissioners-of-food-safety.php','fssai.gov.in'],
+['Maharashtra – Commissioner of Food Safety','महाराष्ट्र – खाद्य सुरक्षा आयुक्त','महाराष्ट्र – अन्न सुरक्षा आयुक्त','mailto:comm.fda-mah@nic.in','comm.fda-mah@nic.in'],
+['Haryana – Food and Drugs Administration','हरियाणा – खाद्य एवं औषधि प्रशासन','हरियाणा – अन्न व औषध प्रशासन','mailto:haryana-fda@hry.gov.in','haryana-fda@hry.gov.in'],
+['West Bengal – Food Safety','पश्चिम बंगाल – खाद्य सुरक्षा','पश्चिम बंगाल – अन्न सुरक्षा','mailto:foodsafetywb@gmail.com','foodsafetywb@gmail.com'],
+['National Consumer Helpline','राष्ट्रीय उपभोक्ता हेल्पलाइन','राष्ट्रीय ग्राहक हेल्पलाइन','tel:1915','1915']];
+const cake=b=>{
+ const pl=`<ellipse cx="100" cy="122" rx="88" ry="8" fill="#0002"/><ellipse cx="100" cy="117" rx="84" ry="8" fill="#fff" stroke="#7d8f99" stroke-width="2"/>`;
+ const bd=`<rect x="44" y="104" width="112" height="12" rx="3" fill="#c98a4b" stroke="#8a5a2b" stroke-width="2"/><rect x="44" y="96" width="112" height="8" fill="#fff3d6" stroke="#e6cfa0"/><rect x="44" y="80" width="112" height="16" fill="#d9a066" stroke="#8a5a2b" stroke-width="2"/><rect x="40" y="70" width="120" height="12" rx="6" fill="#f4b6c8" stroke="#c97a95" stroke-width="2"/><g fill="#f4b6c8"><circle cx="56" cy="84" r="5"/><circle cx="86" cy="86" r="6"/><circle cx="116" cy="85" r="5"/><circle cx="144" cy="84" r="6"/></g><g fill="#d63a4a" stroke="#9c1f2c"><circle cx="72" cy="66" r="6"/><circle cx="128" cy="66" r="6"/></g><path d="M72 60q3-6 7-7M128 60q3-6 7-7" stroke="#3a7a2a" stroke-width="2" fill="none"/><g><circle cx="52" cy="75" r="1.6" fill="#fff"/><circle cx="90" cy="76" r="1.6" fill="#7bb661"/><circle cx="108" cy="75" r="1.6" fill="#fff"/><circle cx="150" cy="76" r="1.6" fill="#f5b800"/></g>`;
+ const hd=`<rect x="94" y="0" width="12" height="18" rx="4" fill="#6b4a2b"/><rect x="91" y="16" width="18" height="4" rx="2" fill="#8f9aa8"/>`;
+ const bl='#d5dce2';
+ return `<svg class="cake" viewBox="0 0 200 130" role="img" aria-label="${t(b?'fake':'real')}"><rect width="200" height="130" fill="#e9eef0"/><defs><clipPath id="cl"><rect width="100" height="130"/></clipPath><clipPath id="cr"><rect x="100" width="100" height="130"/></clipPath></defs>${pl}`+(b?
+ `<g class="jt">${bd}</g><g class="sp" stroke="#f5b800" stroke-width="2.5" stroke-linecap="round"><path d="M100 62v-9M91 64l-7-6M109 64l7-6M86 70h-9M114 70h9"/></g><g class="k kb">${hd}<path d="M94 20h12v36l-4 4-4-4-4 4-4-4z" fill="${bl}"/><path d="M97 22v30" stroke="#fff" stroke-width="2"/><g class="tp"><path d="M94 60l4-4 4 4 4-4-6 14z" fill="${bl}"/></g></g>`:
+ `<g clip-path="url(#cl)">${bd}</g><g class="s"><g clip-path="url(#cr)">${bd}</g></g><g class="k">${hd}<path d="M94 20h12v42l-6 8-6-8z" fill="${bl}"/><path d="M97 22v38" stroke="#fff" stroke-width="2"/></g>`)+'</svg>';
+};
+function view(c,d,note){
+ const op=a=>a.map((x,i)=>`<option value="${i}">${E(x)}</option>`).join('');
+ return `<h2>${E(cn(c))}</h2><p class="big">${E(d.inf)}</p>${note?`<p style="color:var(--mu)">${E(note)}</p>`:''}<div class="panel"><h3>${t('s1')}</h3><div class="g2"><div class="f"><label for="fi">${t('li')}</label><select id="fi" onchange="$('tsp').hidden=true;$('rs2').innerHTML=''">${c.it.map(i=>`<option>${E(i)}</option>`).join('')}</select></div><div class="f"><label for="ph">${t('ph')}</label><input id="ph" type="file" accept="image/*" onchange="pv(this)"></div><div class="f"><label for="lk">${t('lk')}</label><select id="lk">${op(t('lo'))}</select></div><div class="f"><label for="sm">${t('sm')}</label><select id="sm">${op(t('so'))}</select></div></div><img id="pi" alt="" hidden style="max-width:100%;max-height:220px;margin-top:8px;border-radius:4px"><p style="color:var(--mu);font-size:13px;margin:8px 0 0">${t('pnote')}</p><div class="row"><button class="btn p" onclick="showTests('${c.id}')">${t('pt')}</button></div></div><div class="panel" id="tsp" hidden><h3 id="th"></h3><div id="tl"></div><h3 style="margin-top:14px">${t('q3')}</h3><div class="row"><button class="btn p" onclick="yes()">${t('yes')}</button><button class="btn" onclick="judge('${c.id}')">${t('no')}</button></div><div class="row" id="fr" hidden><button class="btn p" onclick="fin('${c.id}')">${t('sr')}</button></div></div><div id="rs2"></div><div class="row"><button class="btn" onclick="go('home',1)">${t('back')}</button><button class="btn p" onclick="rep('${c.id}')">${t('rp')}</button></div>`;
+}
+const DC=[['Added colour in dal','h','A handful of dal. A bowl of warm water.','Soak the dal for 10 minutes. Look at the water.','Streaks of colour in the water mean colour was added.']];
+const SEL={'Paneer':[0,1,2],'Cream':[2],'Cheese':[2],'Mustard oil':[1,2],'Coconut oil':[0,1],'Groundnut oil':[1],'Sunflower oil':[1],'Soybean oil':[1],'Sesame (til) oil':[1],'Palm oil':[1],'Refined oil':[1],'Turmeric (haldi) powder':[0,2,4],'Red chilli powder':[1,2,4],'Coriander powder':[2,4],'Cumin (jeera)':[2,4],'Black pepper':[3,4],'Garam masala':[2,4],'Toor or arhar dal':[0,2],'Moong dal':[1],'Chana dal':[0,2],'Besan':[2],'Tea leaves':[0,1],'Tea dust':[0,1],'Instant coffee':[2],'Coffee powder':[2],'Sugar':[0],'Salt':[0,2],'Jaggery (gur)':[1]};
+const IT={'Masoor dal':DC,'Urad dal':DC,
+'Khoa or mawa':[['Starch in khoa','h','A small piece of khoa. Water. Iodine.','Boil a small piece in a little water. Let it cool. Add 2 drops of iodine.','Blue or purple means starch. Pure khoa stays brown.'],['Grainy feel','h','A pinch of khoa.','Rub it between your fingers.','Pure khoa feels a little grainy and greasy. A smooth, sticky, pasty feel is suspicious. This is only a hint.'],['Cheap fat or filler','l','','Only a lab can find out.','']],
+'Curd or dahi':[['Starch in curd','h','A spoon of curd. Water. Iodine.','Mix the curd with a little water in a pan and boil it. Let it cool. Add 2 drops of iodine.','Blue or purple means starch is mixed in.'],['Thickness check','h','A spoon of curd on a plate.','Tilt the plate slowly.','Pure curd slides slowly in a soft lump. Curd that is glue-like and stretchy may have starch or gelatin. Very watery curd may be diluted. This is only a hint.'],['Other fillers','l','','Only a lab can find out.','']],
+'Buttermilk (chaas)':[['Starch in buttermilk','h','Half a cup of buttermilk. A small pan. Iodine.','Boil the buttermilk for one minute. Let it cool. Add 2 drops of iodine.','Blue or purple means starch is mixed in.'],['Water added to buttermilk','h','A clean steel spoon. A glass of buttermilk.','Dip the spoon in and lift it out. Look at how the buttermilk coats it.','Pure buttermilk leaves a thin white coat that stays for a moment. Very watery buttermilk runs off at once. This is only a hint.'],['Preservatives or colour','l','','Only a lab can find out.','']],
+'Butter':[['Starch (mashed potato) in butter','h','A spoon of butter. Hot water. Iodine.','Melt the butter in hot water. Let it cool a little. Add 2 drops of iodine.','Blue colour means starch is mixed in.'],['Melting check','h','A spoon of butter. A clean pan on low heat.','Melt the butter on low heat. Watch it.','Pure butter melts evenly into a clear golden liquid with a little foam. Lots of spitting means too much water. A waxy look is suspicious. This is only a hint.'],['Margarine or cheap fat','l','','Only a lab can find out.','']],
+'Hing (asafoetida)':[['Burn test','h','A very small lump of hing. A spoon. A flame (ask an adult).','Hold the hing on the spoon over the flame.','Pure hing burns easily with a bright flame. If it only turns black or glows, it may be mixed. This is only a hint.'],['Water test','h','A glass of water. A pinch of hing.','Stir the hing in the water.','Pure hing makes a milky white mix. Mixed hing leaves sand or sediment at the bottom.'],['Gum, resin or soapstone','l','','Only a lab can find out.','']]};
+const tH=(x,i)=>`<div class="t"><h3>${E(x[0])}<span class="tag ${x[1]}">${t(x[1]==='h'?'ht':'lt')}</span></h3><dl>${x[2]?`<dt>${t('nd')}</dt><dd>${E(x[2])}</dd>`:''}<dt>${t('dd')}</dt><dd>${E(x[3])}</dd>${x[4]?`<dt>${t('sg')}</dt><dd>${E(x[4])}</dd>`:''}</dl>${x[1]==='h'?`<div class="f tsel" hidden style="margin-top:8px"><label for="tr${i}">${t('lr')}</label><select id="tr${i}" class="tr"><option value="0">${t('tn')}</option><option value="1">${t('tpn')}</option><option value="2">${t('twn')}</option></select></div>`:''}</div>`;
+async function trI(it,L){
+ const key='cf3i_'+lang+'_'+it;
+ try{const v=localStorage.getItem(key);if(v)return JSON.parse(v)}catch(e){}
+ try{
+  const sm=window.claude&&await claude.use('sample');if(!sm)throw 0;
+  const flat=[];L.forEach(x=>flat.push(x[0],x[2],x[3],x[4]));
+  const o=await sm.json(`Translate every string in this JSON array into ${LN[lang]}. Keep names like iodine, FSSAI as they are. Empty strings stay empty. Return only a JSON array with the same length.\n`+JSON.stringify(flat));
+  if(!Array.isArray(o)||o.length!==flat.length)throw 0;
+  const r=L.map((x,i)=>[o[4*i],x[1],o[4*i+1],o[4*i+2],o[4*i+3]]);
+  try{localStorage.setItem(key,JSON.stringify(r))}catch(e){}
+  return r;
+ }catch(e){return L}
+}
+async function showTests(id){
+ const c=cat(id),it=$('fi').value;let L;
+ $('rs2').innerHTML='';$('fr').hidden=true;$('th').textContent=t('tt')+': '+it;$('tl').textContent=t('tr');$('tsp').hidden=false;
+ if(IT[it]){L=IT[it];if(lang!=='en')L=await trI(it,L)}
+ else L=(SEL[it]||c.t.map((_,i)=>i)).map(i=>cd.t[i]);
+ if($('fi').value!==it)return;
+ $('tl').innerHTML=L.map(tH).join('');$('tsp').scrollIntoView({behavior:'smooth'});
+}
+async function open_(id,keep){
+ cur=id;const c=cat(id);go('cat');
+ const sec=$('p-cat');sec.insertAdjacentHTML('afterbegin','');
+ const set=(d,n)=>{cd=d;if(cur===id&&page==='cat')sec.innerHTML=`<div style="margin-bottom:10px;max-width:340px">${art(id)}</div>`+view(c,d,n)};
+ const en={inf:I[id],t:c.t};
+ if(lang==='en'){set(en);return}
+ const key='cf3_'+lang+'_'+id;
+ try{const v=localStorage.getItem(key);if(v){set(JSON.parse(v));return}}catch(e){}
+ set(en,t('tr'));
+ try{
+  const sm=window.claude&&await claude.use('sample');
+  if(!sm)throw 0;
+  const flat=[I[id]];c.t.forEach(x=>flat.push(x[0],x[2],x[3],x[4]));
+  const o=await sm.json(`Translate every string in this JSON array into ${LN[lang]}. Keep names like iodine, FSSAI, NMR as they are. Empty strings stay empty. Return only a JSON array with the same length.\n`+JSON.stringify(flat));
+  if(!Array.isArray(o)||o.length!==flat.length)throw 0;
+  const d={inf:o[0],t:c.t.map((x,i)=>[o[1+4*i],x[1],o[2+4*i],o[3+4*i],o[4+4*i]])};
+  try{localStorage.setItem(key,JSON.stringify(d))}catch(e){}
+  set(d);
+ }catch(e){set(en,t('tf'))}
+}
+async function ask(){
+ const q=$('aq').value.trim(),o=$('ao');if(!q)return;
+ o.textContent=t('tr');
+ try{
+  const sm=window.claude&&await claude.use('sample');if(!sm)throw 0;
+  const r=await sm(`You help people in India with food adulteration. Write in ${lang==='en'?'very simple English':LN[lang]}, with short sentences and easy words, under 120 words. For the problem below: 1) say what could be wrong (use "could be", never claim it is certain), 2) give one or two safe home tests with simple steps, 3) say when to see a doctor or contact the Food Safety Officer or FSSAI. Never ask the person to taste the food. Do not diagnose illness. Problem: """${q}"""`,{modelTier:'quick'});
+  o.textContent=r.text;
+  const b=document.createElement('button');b.className='btn';b.textContent=t('rp2');b.style.cssText='display:block;margin-top:10px';
+  b.onclick=()=>{$('de').value=q;go('report')};o.appendChild(b);
+ }catch(e){o.textContent=t('af')}
+}
+function pv(i){const f=i.files[0],m=$('pi');$('so').textContent='';if(!f){m.hidden=true;return}m.src=URL.createObjectURL(f);m.hidden=false}
+function small(f){return new Promise((ok,no)=>{const u=URL.createObjectURL(f),x=new Image();x.onerror=no;x.onload=()=>{const k=Math.min(1,1024/Math.max(x.width,x.height)),c=document.createElement('canvas');c.width=Math.round(x.width*k);c.height=Math.round(x.height*k);c.getContext('2d').drawImage(x,0,0,c.width,c.height);c.toBlob(ok,'image/jpeg',.8)};x.src=u})}
+function yes(){document.querySelectorAll('.tsel').forEach(e=>e.hidden=false);$('fr').hidden=false;$('rs2').innerHTML='';$('fr').scrollIntoView({behavior:'smooth',block:'center'})}
+function result(id,bad){
+ $('rs2').innerHTML=`<div class="res ${bad?'bad':'ok'}">${cake(bad)}<h3>${t(bad?'fake':'real')}</h3>${bad?'':`<p class="ic">${t('ic')}</p>`}<p>${t('rn')}</p>${bad?`<div class="row" style="justify-content:center"><button class="btn p" onclick="repF('${id}')">${t('rp')}</button></div>`:''}</div>`;
+ $('rs2').scrollIntoView({behavior:'smooth'});
+}
+function fin(id){
+ let bad=0,ok=0;document.querySelectorAll('.tr').forEach(x=>{if(x.value==='2')bad++;if(x.value==='1')ok++});
+ if(!bad&&!ok){$('rs2').innerHTML=`<p class="er">${t('dn')}</p>`;return}
+ result(id,bad>0);
+}
+async function judge(id){
+ $('rs2').innerHTML=`<p>${t('jg')}</p>`;
+ let bad=+$('lk').value>0||+$('sm').value>0;const f=$('ph').files[0];
+ if(f&&!bad){try{
+  const sm=window.claude&&await claude.use('sample');if(!sm)throw 0;
+  const L=await sm.limits();if(!L||!L.images)throw 0;
+  const r=await sm(`Photo of ${$('fi').value} (${cat(id).n[0]}), an Indian food item. Look only for warning signs you can really see: odd colour, specks or dirt, layers, mould, bright dye, lumps, damaged or unclear label. Reply with one word only: WARNING or CLEAR.`,{images:[await small(f)],modelTier:'default'});
+  if(/WARNING/i.test(r.text))bad=true;
+ }catch(e){}}
+ result(id,bad);
+}
+function repF(id){const v=$('fi').value,a=+$('lk').value,b=+$('sm').value;rep(id);$('item').value=v;$('rs').value='Looks adulterated';$('de').value='Looks: '+T.en.lo[a]+'. Smell: '+T.en.so[b]+'.'}
+function rep(id){go('report');$('cat').value=id;items()}
+function draft(r){
+ const c=cat(r.cat);
+ return `To,\nThe Food Safety Officer, ${r.di}, ${r.st}\n\nSubject: Complaint about suspected adulteration of ${r.item} (${c.n[0]})\n\nProduct: ${r.item}\nBrand: ${r.brand||'Not known'} (${r.pk})\nBought from: ${r.shop||'Not specified'}\nLocation: ${r.ar}, ${r.di}, ${r.st}${r.pin?' – '+r.pin:''}\nTest tried: ${r.te||'None'} (${r.rs})\n${r.de?'Details: '+r.de+'\n':''}\nI request an inspection and sampling. I have kept the packet, bill and photos.\n\nThank you.`;
+}
+function show(r){
+ $('dr').value=draft(r);$('wa').href='https://wa.me/?text='+encodeURIComponent($('dr').value);$('cm').textContent='';
+ $('db').hidden=false;$('db').scrollIntoView();
+}
+function save(e){
+ e.preventDefault();const pin=$('pin').value.trim();
+ if(pin&&!/^[1-9][0-9]{5}$/.test(pin)){$('pe').textContent=t('pe');$('pin').focus();return false}
+ $('pe').textContent='';const g=i=>$(i).value.trim();
+ const r={id:Date.now(),cat:g('cat'),item:g('item'),brand:g('brand'),pk:g('pk'),shop:g('shop'),st:g('st'),di:g('di'),ar:g('ar'),pin,te:g('te'),rs:g('rs'),de:g('de')};
+ R.unshift(r);store();show(r);return false;
+}
+function cp(){
+ const x=$('dr');x.select();
+ const ok=()=>$('cm').textContent=t('cd'),no=()=>$('cm').textContent=t('cf');
+ try{navigator.clipboard.writeText(x.value).then(ok,()=>document.execCommand('copy')?ok():no())}catch(e){try{document.execCommand('copy')?ok():no()}catch(y){no()}}
+}
+function view_(id){go('report');show(R.find(r=>r.id===id))}
+function del(id){R=R.filter(r=>r.id!==id);store();renderMine()}
+function renderMine(){
+ $('ml').innerHTML=R.length?R.map(r=>`<div class="rep"><b>${E(r.item)}</b> – ${E(r.brand||'—')}<br><span style="color:var(--mu)">${E(r.ar)}, ${E(r.di)}, ${E(r.st)}</span><div class="row"><button class="btn" onclick="view_(${r.id})">${t('vw')}</button><button class="btn" onclick="del(${r.id})">${t('dl')}</button></div></div>`).join(''):`<p style="margin:0">${t('em')}</p>`;
+}
+paint();go('home');
+</script>
+</body>
+</html>
