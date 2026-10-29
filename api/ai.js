@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
     if (image) parts.push({ inline_data: { mime_type: 'image/jpeg', data: image } });
 
     const r = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent',
       {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'x-goog-api-key': key },
