@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
     if (!prompt) return res.status(400).json({ error: 'prompt missing' });
     const parts = [{ text: String(prompt).slice(0, 8000) }];
     if (image) parts.push({ inline_data: { mime_type: 'image/jpeg', data: image } });
-    const models = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.5-flash-lite'];
+    const models = ['gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-flash-latest'];
     let last = '';
     for (const m of models) {
       for (let i = 0; i < 2; i++) {
