@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
           {
             method: 'POST',
             headers: { 'content-type': 'application/json', 'x-goog-api-key': key },
-            body: JSON.stringify({ contents: [{ parts }] }),
+            body: JSON.stringify({ contents: [{ parts }], generationConfig: { maxOutputTokens: 400, thinkingConfig: { thinkingBudget: 0 } } }),
           }
         );
         if (r.ok) {
